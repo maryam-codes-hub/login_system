@@ -1,8 +1,9 @@
-from flask import Flask,render_template, request, redirect, url_for
+from flask import Flask,render_template, request, redirect, url_for,session
 import mysql.connector
 import bcrypt
 
 app = Flask(__name__)
+app.secret_key = "abc123xyz_temporary_secret" 
 
 # databse connection
 db=mysql.connector.connect(
@@ -59,9 +60,17 @@ def login():
     stored_password = user[3]  # password column
 
     if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
-        return "Login successful!"
+        session['username'] = user[1]   # session mein username save karna
+        session['user_id'] = user[0]    # session mein id save karna
+        return redirect(url_for('dashboard'))
     else:
         return "Wrong password"
+
+@app.route('/dashboard')
+def dashboard():
+    if 'username' not in session:
+        return redirect(url_for('login_page'))
+    return f"Welcome, {session['username']}! You are logged in."
     
 if __name__ == "__main__":
     app.run(debug=True)
