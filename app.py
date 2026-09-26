@@ -1,16 +1,20 @@
 from flask import Flask,render_template, request, redirect, url_for,session
 import mysql.connector
 import bcrypt
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  
 
 app = Flask(__name__)
-app.secret_key = "abc123xyz_temporary_secret" 
+app.secret_key =os.getenv("SECRET_KEY")
 
 # databse connection
-db=mysql.connector.connect(
-      host="localhost",
-      user="root",
-      password="Mysql@2026#Db",
-      database="login_system"
+db = mysql.connector.connect(
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
 )
 
 @app.route('/')
