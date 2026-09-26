@@ -39,20 +39,26 @@ def signup():
 
     # Database mein save karna
     cursor = db.cursor()
-    cursor.execute(
+    try:
+       cursor.execute(
         "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)",
         (username, email, hashed_password)
     )
-    db.commit()
-    cursor.close()
+       db.commit()
+       cursor.close()
 
-    return redirect(url_for('login_page'))
+       return redirect(url_for('login_page'))
+    except mysql.connector.errors.IntegrityError:
+        cursor.close()
+        return "Username or Email already exists. Please try a different one."
+
 
 @app.route('/login', methods=['POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
-
+    username = request.form.get('username', '').strip()
+    password = request.form.get('password', '').strip()
+    if not username or not password:
+      return "Username and password are required."
     cursor = db.cursor()
     cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
