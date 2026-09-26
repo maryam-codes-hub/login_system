@@ -70,7 +70,13 @@ def login():
 def dashboard():
     if 'username' not in session:
         return redirect(url_for('login_page'))
-    return f"Welcome, {session['username']}! You are logged in."
+    return render_template('dashboard.html', username=session['username'])
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login_page'))
     
 if __name__ == "__main__":
     app.run(debug=True)
